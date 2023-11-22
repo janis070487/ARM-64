@@ -134,6 +134,7 @@
   <ItemGroup>
     <ClInclude Include="ARM64.h" />
     <ClInclude Include="Comands.h" />
+    <ClInclude Include="const.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
