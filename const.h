@@ -1,6 +1,7 @@
 #pragma once
 
 #define ull unsigned long long
+//#define ull long long
 #define FP 28
 #define LR 29
 #define SP 30

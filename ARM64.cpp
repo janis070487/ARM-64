@@ -4,7 +4,7 @@
 
 #define ull unsigned long long
 
-
+//___________________________________________________________________________________________________
 
 ARM64::ARM64() {
 	for (int i = 0; i < 33; i++) {
@@ -12,12 +12,14 @@ ARM64::ARM64() {
 	}
 }
 
+//___________________________________________________________________________________________________
+
 string ARM64::GetValueHEX(ull value) {
 	string result = "0x";
-	ull a = 0;
-	for (int i = 0; i < 16; i++) {
-		a = value >> i * 4;
-		a = a & this->mask;
+	ull a = value;
+	for (int i = 15; i > -1; i--) {
+		a = value >> (i * 4);
+		a = a & this->maskH;
 		switch (a)
 		{
 		case 0: result = result + '0';
@@ -53,43 +55,143 @@ string ARM64::GetValueHEX(ull value) {
 		case 15: result = result + 'f';
 			break;
 		}
+		
 	}
 	return result;
 }
 
+//___________________________________________________________________________________________________
+
 string ARM64::GetValueBIN(ull value) {
+
 	string result = "0b";
+	ull a = value;
+	for (int i = 63; i > -1; i--) {
+		a = value >> i;
+		a = a & this->maskB;
+		switch (a)
+		{
+		case 0: result = result + '0';
+			break;
+		case 1: result = result + '1';
+			break;
+		}
+	}
 	return result;
 }
+
+//___________________________________________________________________________________________________
+
 void ARM64::PrintAllRegistrToStringConsole(string format) {
-
-}
-
-void ARM64::PrintOneRegistrToStringComsole(int whichOne, string format) {
 	if (format == "HEX") {
-		//std::cout << GetValueHEX(this->Registr[whichOne]) << endl;
-		std::cout << format << std::endl;
+		for (int i = 0; i < 33; i++) {
+			string result = "R" + to_string(i) + " :" + GetValueHEX(this->Registr[i]) + "\t";
+			std::cout << result << endl;
+		}
 	}
 
 	else if (format == "BIN") {
-		//std::cout << GetValueBIN(this->Registr[whichOne]) << endl;
-		std::cout << format << std::endl;
+		for (int i = 0; i < 33; i++) {
+			string result = "R" + to_string(i) + " :" + GetValueBIN(this->Registr[i]) + "\t";
+			std::cout << result << endl;
+		}
 	}
 
 	else {
-		//std::cout << "**********" << endl;
+		for (int i = 0; i < 33; i++) {
+			string result = "R" + to_string(i) + " :" + "**********\t";
+			std::cout << result << endl;
+		}	
+	}
+}
+
+//___________________________________________________________________________________________________
+
+void ARM64::PrintOneRegistrToStringComsole(int whichOne, string format) {
+	if (format == "HEX") {
+		string result = "R" + to_string(whichOne) + " :" + GetValueHEX(this->Registr[whichOne]);
+		std::cout << result << endl;	
+	}
+
+	else if (format == "BIN") {
+		string result = "R" + to_string(whichOne) + ": " + GetValueBIN(this->Registr[whichOne]);
+		std::cout << result << endl;
+	}
+
+	else {
+		std::cout << "**********" << endl;
 	}
 
 }
 
+//___________________________________________________________________________________________________
+
+void ARM64::PrintFromToRegistrToStringComsole(int From, int To, string format) {
+	int from = From;
+	int to = To;
+	if (from < 0) from = 0;
+	if (to > 33) to = 33;
+	if (From < 0) From = 0;
+	if (format == "HEX") {
+		for (int i = from; i < to; i++) {
+			string result = "R" + to_string(i) + " :" + GetValueHEX(this->Registr[i]) + "\t";
+			std::cout << result << endl;
+		}
+	}
+
+	else if (format == "BIN") {
+		for (int i = from; i < to; i++) {
+			string result = "R" + to_string(i) + " :" + GetValueBIN(this->Registr[i]) + "\t";
+			std::cout << result << endl;
+		}
+	}
+
+	else {
+		for (int i = from; i < to; i++) {
+			string result = "R" + to_string(i) + " :" + "**********\t";
+			std::cout << result << endl;
+		}
+	}
+}
+
 //_________________ Comands __________________________________
+
+
 void ARM64::MOW_RR(int in, int out) {
 	this->Registr[in] = this->Registr[out];
 }
+//___________________________________________________________________________________________________
 
-void ARM64::MOW_RC(int in, unsigned short con) {
+void ARM64::MOW_RC(int in, unsigned short con) { //unsigned short
 	this->Registr[in] = con;
 }
+
+//___________________________________________________________________________________________________
+
+void ARM64::LSL(int x, int y, int cik) {
+	this->Registr[x] = this->Registr[y] << cik;
+}
+
+//___________________________________________________________________________________________________
+
+void ARM64::LSR(int x, int y, int cik) {
+	this->Registr[x] = this->Registr[y] >> cik;
+}
+
+//___________________________________________________________________________________________________
+
+void ARM64::ASR(int x, int y, int cik) {
+
+}
+
+//___________________________________________________________________________________________________
+
+void ARM64::ROR(int x, int y, int cik) {
+
+}
+
+//___________________________________________________________________________________________________
+//___________________________________________________________________________________________________
 
 
 
