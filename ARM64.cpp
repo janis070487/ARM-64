@@ -13,10 +13,23 @@ ARM64::ARM64() {
 }
 
 //___________________________________________________________________________________________________
-
+void ARM64::Format(bool IsFormat) {
+	this->format = IsFormat;
+}
+//___________________________________ Varbût pievienot ______________________________
+/* void ARM64::FormatTo(int byteTo) {
+	if (bytee <= 8) {
+		this->bytee = byteTo;
+	}
+	else
+	{
+		this->bytee = 8;
+	}
+} */
 string ARM64::GetValueHEX(ull value) {
 	string result = "0x";
 	ull a = value;
+	int formatSpace = 0;
 	for (int i = 15; i > -1; i--) {
 		a = value >> (i * 4);
 		a = a & this->maskH;
@@ -55,7 +68,11 @@ string ARM64::GetValueHEX(ull value) {
 		case 15: result = result + 'f';
 			break;
 		}
-		
+		formatSpace++;
+		if (formatSpace == 2 && format) {
+			result = result + " ";
+			formatSpace = 0;
+		}
 	}
 	return result;
 }
@@ -66,6 +83,7 @@ string ARM64::GetValueBIN(ull value) {
 
 	string result = "0b";
 	ull a = value;
+	int formatSpace = 0;
 	for (int i = 63; i > -1; i--) {
 		a = value >> i;
 		a = a & this->maskB;
@@ -76,8 +94,19 @@ string ARM64::GetValueBIN(ull value) {
 		case 1: result = result + '1';
 			break;
 		}
+		formatSpace++;
+		if (formatSpace == 8 && format) {
+			result = result + " ";
+			formatSpace = 0;
+		}
 	}
 	return result;
+}
+
+//___________________________________________________________________________________________________
+
+string ARM64::GetValueDEC(ull value) {
+	return std::to_string(value);
 }
 
 //___________________________________________________________________________________________________
@@ -93,6 +122,13 @@ void ARM64::PrintAllRegistrToStringConsole(string format) {
 	else if (format == "BIN") {
 		for (int i = 0; i < 33; i++) {
 			string result = "R" + to_string(i) + " :" + GetValueBIN(this->Registr[i]) + "\t";
+			std::cout << result << endl;
+		}
+	}
+
+	else if (format == "DEC") {
+		for (int i = 0; i < 33; i++) {
+			string result = "R" + to_string(i) + " :" + GetValueDEC(this->Registr[i]) + "\t";
 			std::cout << result << endl;
 		}
 	}
@@ -115,6 +151,11 @@ void ARM64::PrintOneRegistrToStringComsole(int whichOne, string format) {
 
 	else if (format == "BIN") {
 		string result = "R" + to_string(whichOne) + ": " + GetValueBIN(this->Registr[whichOne]);
+		std::cout << result << endl;
+	}
+
+	else if (format == "DEC") {
+		string result = "R" + to_string(whichOne) + ": " + GetValueDEC(this->Registr[whichOne]);
 		std::cout << result << endl;
 	}
 
@@ -142,6 +183,13 @@ void ARM64::PrintFromToRegistrToStringComsole(int From, int To, string format) {
 	else if (format == "BIN") {
 		for (int i = from; i < to; i++) {
 			string result = "R" + to_string(i) + " :" + GetValueBIN(this->Registr[i]) + "\t";
+			std::cout << result << endl;
+		}
+	}
+
+	else if (format == "DEC") {
+		for (int i = from; i < to; i++) {
+			string result = "R" + to_string(i) + " :" + GetValueDEC(this->Registr[i]) + "\t";
 			std::cout << result << endl;
 		}
 	}
@@ -181,7 +229,11 @@ void ARM64::LSR(int x, int y, int cik) {
 //___________________________________________________________________________________________________
 
 void ARM64::ASR(int x, int y, int cik) {
-
+	bool PN = this->Registr[y] & 0x8000000000000000;
+	this->Registr[x] = this->Registr[y] >> cik;
+	if (PN) this->Registr[x] | 0x8000000000000000;
+	else this->Registr[x] | 0x0000000000000000;
+	//this->Registr[x] = this->Registr[x] 
 }
 
 //___________________________________________________________________________________________________

@@ -8,20 +8,25 @@ using namespace std;
 
 class ARM64 {
 
-//private:
-private:
+//private
+	bool format = false;
+	int bytee = 8;
 	ull maskH = 0x000000000000000f;
 	ull maskB = 1;
 	ull Registr[33];
 	
 	string GetValueHEX(ull value);
 	string GetValueBIN(ull value);
+	string GetValueDEC(ull value);
 public:
 	ARM64();
 	
 	
 	//string GetValueBin(ull value);
-	
+	void Format(bool IsFormat);
+	//___________________________________ Varbût pievienot ______________________________
+	//void FormatTo(int byteTo);
+
 	void PrintAllRegistrToStringConsole(string format);
 	void PrintOneRegistrToStringComsole(int whichOne, string format);
 	void PrintFromToRegistrToStringComsole(int From, int To, string format);
