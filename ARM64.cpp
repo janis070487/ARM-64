@@ -205,12 +205,12 @@ void ARM64::PrintFromToRegistrToStringComsole(int From, int To, string format) {
 //_________________ Comands __________________________________
 
 
-void ARM64::MOW_RR(int in, int out) {
+void ARM64::MOV_RR(int in, int out) {
 	this->Registr[in] = this->Registr[out];
 }
 //___________________________________________________________________________________________________
 
-void ARM64::MOW_RC(int in, unsigned short con) { //unsigned short
+void ARM64::MOV_RC(int in, unsigned short con) { //unsigned short
 	this->Registr[in] = con;
 }
 
@@ -231,19 +231,65 @@ void ARM64::LSR(int x, int y, int cik) {
 void ARM64::ASR(int x, int y, int cik) {
 	bool PN = this->Registr[y] & 0x8000000000000000;
 	this->Registr[x] = this->Registr[y] >> cik;
-	if (PN) this->Registr[x] | 0x8000000000000000;
-	else this->Registr[x] | 0x0000000000000000;
-	//this->Registr[x] = this->Registr[x] 
+	if (PN) {
+		this->Registr[x] & 0x8000000000000000;
+		this->Registr[x] = this->Registr[x] + 0x8000000000000000;
+	}
+	
 }
 
-//___________________________________________________________________________________________________
+//____________________________________________ ROR _______________________________________________________
 
 void ARM64::ROR(int x, int y, int cik) {
-
+	this->Registr[x] = (this->Registr[y] >> cik) | (this->Registr[y] << (sizeof(this->Registr[y]) * 8 - cik));
+	//rotateRight
 }
 
 //___________________________________________________________________________________________________
+
+void ARM64::MOVK(int x, unsigned short value, int cik) {
+	if ((cik == 0) || (cik == 16) || (cik == 32) || (cik == 48)) {
+		ull a = value;
+		a = a << cik;
+		this->Registr[x] = this->Registr[x] + a;
+	}
+	else {
+		cout << "EROR: Nepielaujama komandas operanda vertiba" << endl;
+	}
+}
+
 //___________________________________________________________________________________________________
+
+void ARM64::MOVZ(int x, unsigned short value, int cik) {
+	if ((cik == 0) || (cik == 16) || (cik == 32) || (cik == 48)) {
+		ull a = value;
+		a = a << cik;
+		this->Registr[x] = 0;
+		this->Registr[x] = this->Registr[x] + a;
+	}
+	else {
+		cout << "EROR: Nepielaujama komandas operanda vertiba" << endl;
+	}
+}
+
+//___________________________________________________________________________________________________
+
+
+
+//___________________________________________________________________________________________________
+
+
+//___________________________________________________________________________________________________
+//___________________________________________________________________________________________________
+
+
+//___________________________________________________________________________________________________
+//___________________________________________________________________________________________________
+
+
+//___________________________________________________________________________________________________
+//___________________________________________________________________________________________________
+
 
 
 
