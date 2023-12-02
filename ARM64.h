@@ -21,7 +21,7 @@ class ARM64 {
 public:
 	ARM64();
 	
-	
+	void Apcode(unsigned int);
 	//string GetValueBin(ull value);
 	void Format(bool IsFormat);
 	//___________________________________ Varbût pievienot ______________________________
