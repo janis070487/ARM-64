@@ -22,6 +22,7 @@ public:
 	ARM64();
 	
 	void Apcode(unsigned int);
+	string BIN(unsigned int value, int cik);
 	//string GetValueBin(ull value);
 	void Format(bool IsFormat);
 	//___________________________________ Varbût pievienot ______________________________
@@ -43,11 +44,17 @@ public:
 	void ASR(int x, int y, int cik);         // Aritmçtiskais shift pa labi
 	void ROR(int x, int y, int cik);		 // Rotate pa labi
 
-	void MOVK_RC(int x, unsigned short value, int cik);
+
 
 	// https://metanit.com/assembler/arm64/2.16.php
 	void MOVK(int x, unsigned short value, int cik);	    // ievieto konkretos bitus reìistrâ pârçjos neaiztiekot
 	void MOVZ(int x, unsigned short, int cik);		// ievieto konkretos bitus reìistrâ pârçjos iestatot nulçs
-	void MOVN(int x, unsigned short, int value); // ielâdç inverso skaitli no konstantes
+	void MOVN(int x, unsigned short value, int cik); // ielâdç inverso skaitli no konstantes
+
+
+	// https://metanit.com/assembler/arm64/2.18.php
+	void SBFM(int x, int y, int no, int lidz);  // Kopç noteiktus bitus no reìistra uz registru un òem verâ zimi
+	void UBFM(int x, int y, int no, int lidz);  // Kopç noteiktus bitus no reìistra uz registru un neòem vçrâ zîmi
+	void EXTR(int x, int y, int z, int bit);    // kopç no divu reìistru daïas citâ reìistrâ
 	
 };

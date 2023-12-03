@@ -16,27 +16,57 @@ ARM64::ARM64() {
 //___________________________________________________________________________________________________
 
 void ARM64::Apcode(unsigned int code) {
-	unsigned int Bits = 0;
-	unsigned int Opcode = 0;
-	unsigned int ConditionCode = 0;
-	unsigned int Shift = 0;
-	unsigned int None = 0;
-	unsigned int Rm = 0;
-	unsigned int Imm6 = 0;
-	unsigned int Rn = 0;
-	unsigned int Rd = 0;
+	unsigned int Bits = code >> 31;
+	unsigned int Opcode = ((code & 0b01000000000000000000000000000000) >> 25) + ((code & 0b00011111000000000000000000000000) >> 24);
+	unsigned int ConditionCode = (code & 0b00100000000000000000000000000000) >> 29;
+	unsigned int Shift = (code & 0b00000000110000000000000000000000) >> 22;
+	unsigned int None = (code & 0b00000000001000000000000000000000) >> 21;
+	unsigned int Rm = (code & 0b00000000000111110000000000000000) >> 16;
+	unsigned int Imm6 = (code & 0b00000000000000001111110000000000) >> 10;
+	unsigned int Rn = (code & 0b00000000000000000000001111100000) >> 5;
+	unsigned int Rd = (code & 0b00000000000000000000000000011111);
 
-	Bits = code >> 31;
-	Opcode =       ((code & 0b01000000000000000000000000000000) >> 25) + ((code & 0b00011111000000000000000000000000) >> 24);
-	ConditionCode = (code & 0b00100000000000000000000000000000) >> 29;
-	Shift =         (code & 0b00000000110000000000000000000000) >> 22;
-	None =			(code & 0b00000000001000000000000000000000) >> 21;
-	Rm =			(code & 0b00000000000111110000000000000000) >> 16;
-	Imm6 =          (code & 0b00000000000000001111110000000000) >> 10;
-	Rn =			(code & 0b00000000000000000000001111100000) >> 5;
-	Rd =            (code & 0b00000000000000000000000000011111);
+	string Bits_S = BIN(Bits, 1);
+	string Opcode_S = BIN(Opcode, 6);
+	string ConditionCode_S = BIN(ConditionCode, 1);
+	string Shift_S = BIN(Shift, 2);
+	string None_S = BIN(None, 1);
+	string Rm_S = BIN(Rm, 5);
+	string Imm6_S = BIN(Imm6, 6);
+	string Rn_S = BIN(Rn, 5);
+	string Rd_S = BIN(Rd, 5);
+
+	cout << "_____________________________________________________________________________" << endl;
+	cout << "Bits: \t\t" << "Decimala vertiba: " << Bits<< "\t" << "Binara vertiba: " << Bits_S << "\t" << endl;
+	cout << "Opcode: \t" << "Decimala vertiba: " << Opcode << "\t" << "Binara vertiba: " << Opcode_S << "\t" << endl;
+	cout << "ConditionCode: \t" << "Decimala vertiba: " << ConditionCode << "\t" << "Binara vertiba: " << ConditionCode_S << "\t" << endl;
+	cout << "Shift: \t\t" << "Decimala vertiba: " << Shift << "\t" << "Binara vertiba: " << Shift_S << "\t" << endl;
+	cout << "None: \t\t" << "Decimala vertiba: " << None << "\t" << "Binara vertiba: " << None_S << "\t" << endl;
+	cout << "Rm: \t\t" << "Decimala vertiba: " << Rm << "\t" << "Binara vertiba: " << Rm_S << "\t" << endl;
+	cout << "Imm6: \t\t" << "Decimala vertiba: " << Imm6 << "\t" << "Binara vertiba: " << Imm6_S << "\t" << endl;
+	cout << "Rn: \t\t" << "Decimala vertiba: " << Rn << "\t" << "Binara vertiba: " << Rn_S << "\t" << endl;
+	cout << "Rd: \t\t" << "Decimala vertiba: " << Rd << "\t" << "Binara vertiba: " << Rd_S << "\t" << endl;
+	cout << "_____________________________________________________________________________" << endl;
+
 }
 
+string ARM64::BIN(unsigned int value, int cik) {
+	string result = "";
+	ull a = value;
+	int position = 32 - (33 - cik);
+	for (int i = position; i > -1; i--) {
+		a = value >> i;
+		a = a & this->maskB;
+		switch (a)
+		{
+		case 0: result = result + '0';
+			break;
+		case 1: result = result + '1';
+			break;
+		}
+	}
+	return result;
+}
 /*
  
  D2801005   mov x5, #128
@@ -313,12 +343,54 @@ void ARM64::MOVZ(int x, unsigned short value, int cik) {
 
 //___________________________________________________________________________________________________
 
-
+void ARM64::MOVN(int x, unsigned short value, int cik) {
+	if ((cik == 0) || (cik == 16) || (cik == 32) || (cik == 48)) {
+		//unsigned short b = 
+		ull a = (~value);
+		a = a << cik;
+		this->Registr[x] = a;
+		//this->Registr[x] = this->Registr[x] + a;
+	}
+	else {
+		cout << "EROR: Nepielaujama komandas operanda vertiba" << endl;
+	}
+}
 
 //___________________________________________________________________________________________________
 
+void ARM64::SBFM(int x, int y, int no, int lidz) {
+	ull result = this->Registr[y];
+	//    4   9
+	// 011001 11000 11101
+	// 
+	result = result << (15 - lidz);
+	result = result >> (15 - lidz + (no + 1));
+	ull numberOfSigns = result >> (lidz - no + 1);
+	if (numberOfSigns) {
+		this->Registr[x] = 0;
+		this->Registr[x] = ~this->Registr[x];
+		this->Registr[x] = this->Registr[x];
+		//  11111111
+		//  00001101
+		//  11110010
+		//  00001101
+		//  
+	}
+	else {
+		this->Registr[x] = result;
+	}
+}
 
 //___________________________________________________________________________________________________
+
+void ARM64::UBFM(int x, int y, int no, int lidz) {
+	ull result = this->Registr[y]; 
+	result = result << (15 - lidz);
+	result = result >> (15 - lidz + (no + 1));
+	this->Registr[x] = result;
+}
+
+
 //___________________________________________________________________________________________________
 
 
