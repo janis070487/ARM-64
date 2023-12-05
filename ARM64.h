@@ -14,14 +14,19 @@ class ARM64 {
 	ull maskH = 0x000000000000000f;
 	ull maskB = 1;
 	ull Registr[33];
-	
+	ull xzr = 0;
+
 	string GetValueHEX(ull value);
 	string GetValueBIN(ull value);
 	string GetValueDEC(ull value);
 public:
+
 	ARM64();
+
 	
-	void Apcode(unsigned int);
+	void Apcode(unsigned int code);
+	void Comand(unsigned int code);
+
 	string BIN(unsigned int value, int cik);
 	//string GetValueBin(ull value);
 	void Format(bool IsFormat);
@@ -58,3 +63,7 @@ public:
 	void EXTR(int x, int y, int z, int bit);    // kopç no divu reìistru daïas citâ reìistrâ
 	
 };
+
+
+
+

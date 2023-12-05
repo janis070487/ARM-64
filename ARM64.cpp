@@ -12,7 +12,6 @@ ARM64::ARM64() {
 	}
 }
 
-
 //___________________________________________________________________________________________________
 
 void ARM64::Apcode(unsigned int code) {
@@ -38,8 +37,8 @@ void ARM64::Apcode(unsigned int code) {
 
 	cout << "_____________________________________________________________________________" << endl;
 	cout << "Bits: \t\t" << "Decimala vertiba: " << Bits<< "\t" << "Binara vertiba: " << Bits_S << "\t" << endl;
-	cout << "Opcode: \t" << "Decimala vertiba: " << Opcode << "\t" << "Binara vertiba: " << Opcode_S << "\t" << endl;
 	cout << "ConditionCode: \t" << "Decimala vertiba: " << ConditionCode << "\t" << "Binara vertiba: " << ConditionCode_S << "\t" << endl;
+	cout << "Opcode: \t" << "Decimala vertiba: " << Opcode << "\t" << "Binara vertiba: " << Opcode_S << "\t" << endl;
 	cout << "Shift: \t\t" << "Decimala vertiba: " << Shift << "\t" << "Binara vertiba: " << Shift_S << "\t" << endl;
 	cout << "None: \t\t" << "Decimala vertiba: " << None << "\t" << "Binara vertiba: " << None_S << "\t" << endl;
 	cout << "Rm: \t\t" << "Decimala vertiba: " << Rm << "\t" << "Binara vertiba: " << Rm_S << "\t" << endl;
@@ -49,6 +48,7 @@ void ARM64::Apcode(unsigned int code) {
 	cout << "_____________________________________________________________________________" << endl;
 
 }
+
 
 string ARM64::BIN(unsigned int value, int cik) {
 	string result = "";
@@ -67,8 +67,8 @@ string ARM64::BIN(unsigned int value, int cik) {
 	}
 	return result;
 }
-/*
- 
+
+ /*
  D2801005   mov x5, #128
  1 0 110010 10 0 00000 000100 00000 00101
  mov rc
@@ -271,7 +271,44 @@ void ARM64::PrintFromToRegistrToStringComsole(int From, int To, string format) {
 	}
 }
 
-//_________________ Comands __________________________________
+
+
+//_________________ Comands Apcodes ____________________________________________________________________
+
+
+void ARM64::Comand(unsigned int code) {
+	unsigned int Bits = code >> 31;
+	unsigned int Opcode = ((code & 0b01000000000000000000000000000000) >> 25) + ((code & 0b00011111000000000000000000000000) >> 24);
+	unsigned int ConditionCode = (code & 0b00100000000000000000000000000000) >> 29;
+	unsigned int Shift = (code & 0b00000000110000000000000000000000) >> 22;
+	unsigned int None = (code & 0b00000000001000000000000000000000) >> 21;
+	unsigned int Rm = (code & 0b00000000000111110000000000000000) >> 16;
+	unsigned int Imm6 = (code & 0b00000000000000001111110000000000) >> 10;
+	unsigned int Rn = (code & 0b00000000000000000000001111100000) >> 5;
+	unsigned int Rd = (code & 0b00000000000000000000000000011111);
+
+	switch (Opcode)
+	{
+	case 50:   // mov x0, #55
+		ui constt = Rn + (Imm6 << 5) + (Rm << 11);
+		if (Bits) {
+			ui constt = 0;
+			MOV_RC(Rd, constt);
+		}
+		else {
+			MOV_RC(Rd + 40, constt);
+		}
+		break;
+
+	//default:
+	//	break;
+	}
+
+
+
+}
+
+//_________________ Comands ____________________________________________________________________________
 
 
 void ARM64::MOV_RR(int in, int out) {
