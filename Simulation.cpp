@@ -20,8 +20,13 @@ int main()
 
 	ARM64 a;
 	//a.Apcode(0x928001E0); // 1 0 010010 10 0 10000 100000 01111 00000
-	a.Apcode(0xD29FBD00);
+	//a.Apcode(0xAA0203E1);
 	//a.Apcode(0x52800200);
+
+	a.Comand(0x928001C0);   // mov x0, #-15
+	a.Comand(0x128001C1);  // mov w1, #-15
+	
+	
 
 	a.Format(true);
 	a.PrintFromToRegistrToStringComsole(0, 4, "BIN");

@@ -278,30 +278,49 @@ void ARM64::PrintFromToRegistrToStringComsole(int From, int To, string format) {
 
 void ARM64::Comand(unsigned int code) {
 	unsigned int Bits = code >> 31;
-	unsigned int Opcode = ((code & 0b01000000000000000000000000000000) >> 25) + ((code & 0b00011111000000000000000000000000) >> 24);
+	unsigned int Opcode =		((code & 0b01000000000000000000000000000000) >> 25) + ((code & 0b00011111000000000000000000000000) >> 24);
 	unsigned int ConditionCode = (code & 0b00100000000000000000000000000000) >> 29;
-	unsigned int Shift = (code & 0b00000000110000000000000000000000) >> 22;
-	unsigned int None = (code & 0b00000000001000000000000000000000) >> 21;
-	unsigned int Rm = (code & 0b00000000000111110000000000000000) >> 16;
-	unsigned int Imm6 = (code & 0b00000000000000001111110000000000) >> 10;
-	unsigned int Rn = (code & 0b00000000000000000000001111100000) >> 5;
-	unsigned int Rd = (code & 0b00000000000000000000000000011111);
+	unsigned int Shift =		 (code & 0b00000000110000000000000000000000) >> 22;
+	unsigned int None =			 (code & 0b00000000001000000000000000000000) >> 21;
+	unsigned int Rm =			 (code & 0b00000000000111110000000000000000) >> 16;
+	unsigned int Imm6 =			 (code & 0b00000000000000001111110000000000) >> 10;
+	unsigned int Rn =			 (code & 0b00000000000000000000001111100000) >> 5;
+	unsigned int Rd =			 (code & 0b00000000000000000000000000011111);
 
 	switch (Opcode)
 	{
-	case 50:   // mov x0, #55
-		ui constt = Rn + (Imm6 << 5) + (Rm << 11);
+	case 50:									 // mov x0, #55      Ieladç reìistrâ pozitîvu konstantu
+	{
+		unsigned short constt = Rn + (Imm6 << 5) + (Rm << 11);
+		this->Registr[Rd] = constt;
+	}
+		break;
+
+	case 18:									// mov X0, #-55     Ieladç reìistrâ negativu konstantu
+	{
+		unsigned short constt = Rn + (Imm6 << 6) + (Rm << 11);
+		cout << constt << endl;
 		if (Bits) {
-			ui constt = 0;
 			MOV_RC(Rd, constt);
 		}
 		else {
 			MOV_RC(Rd + 40, constt);
 		}
 		break;
-
-	//default:
-	//	break;
+	}
+	case 10:									// mov x0, x1       komç reìistru no reìistra
+		if (Bits){
+			this->Registr[Rd] = this->Registr[Rm];
+		}
+		else {
+			MOV_RR((Rd + 40), Rm);
+		}
+		break;
+		
+	default:
+		
+		cout << "Eror Comand: " << endl;
+		break;
 	}
 
 
@@ -312,12 +331,23 @@ void ARM64::Comand(unsigned int code) {
 
 
 void ARM64::MOV_RR(int in, int out) {
-	this->Registr[in] = this->Registr[out];
+	if (in > 32 || out > 32 ) {
+		this->Registr[in - 40] = 0x00000000ffffffff & (this->Registr[out - 40]);
+	}
+	else {
+		this->Registr[in] = this->Registr[out];
+	}
 }
 //___________________________________________________________________________________________________
 
 void ARM64::MOV_RC(int in, unsigned short con) { //unsigned short
-	this->Registr[in] = con;
+	if (in > 32 || con > 32) {
+		this->Registr[in - 40] = ~(con--);
+	}
+	else {
+		this->Registr[in] = con--;
+	    this->Registr[in] = ~this->Registr[in];
+	}
 }
 
 //___________________________________________________________________________________________________
