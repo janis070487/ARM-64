@@ -124,17 +124,17 @@ string ARM64::GetValueHEX(ull value) {
 			break;
 		case 9: result = result + '9';
 			break;
-		case 10: result = result + 'a';
+		case 10: result = result + 'A';
 			break;
-		case 11: result = result + 'b';
+		case 11: result = result + 'B';
 			break;
-		case 12: result = result + 'c';
+		case 12: result = result + 'C';
 			break;
-		case 13: result = result + 'd';
+		case 13: result = result + 'D';
 			break;
-		case 14: result = result + 'e';
+		case 14: result = result + 'E';
 			break;
-		case 15: result = result + 'f';
+		case 15: result = result + 'F';
 			break;
 		}
 		formatSpace++;
@@ -289,6 +289,16 @@ void ARM64::Comand(unsigned int code) {
 
 	switch (Opcode)
 	{
+	case 51:                                    // LSL x1, x0, #5
+		if (Bits) {
+			this->Registr[Rd] = (this->Registr[Rn] << (63 - Imm6));
+		}
+		else {
+			this->Registr[Rd] = (this->Registr[Rn] << (31 - Imm6));
+			this->Registr[Rd] = (this->Registr[Rd] & 0x00000000FFFFFFFF);
+		}
+		break;
+
 	case 50:									 // mov x0, #55      Ieladç reìistrâ pozitîvu konstantu
 	{
 		unsigned short constt = Rn + (Imm6 << 5) + (Rm << 11);
@@ -298,13 +308,14 @@ void ARM64::Comand(unsigned int code) {
 
 	case 18:									// mov X0, #-55     Ieladç reìistrâ negativu konstantu
 	{
-		unsigned short constt = Rn + (Imm6 << 6) + (Rm << 11);
-		cout << constt << endl;
+		unsigned short constt = Rn + (Imm6 << 5) + (Rm << 11);
 		if (Bits) {
-			MOV_RC(Rd, constt);
+			this->Registr[Rd] = constt;
+			this->Registr[Rd] = ~(this->Registr[Rd]);
 		}
 		else {
-			MOV_RC(Rd + 40, constt);
+			this->Registr[Rd] = ~constt;
+			this->Registr[Rd] = this->Registr[Rd] & 0x00000000FFFFFFFF;
 		}
 		break;
 	}
@@ -313,7 +324,7 @@ void ARM64::Comand(unsigned int code) {
 			this->Registr[Rd] = this->Registr[Rm];
 		}
 		else {
-			MOV_RR((Rd + 40), Rm);
+			this->Registr[Rd] = this->Registr[Rm] & 0x00000000FFFFFFFF;
 		}
 		break;
 		
@@ -330,25 +341,10 @@ void ARM64::Comand(unsigned int code) {
 //_________________ Comands ____________________________________________________________________________
 
 
-void ARM64::MOV_RR(int in, int out) {
-	if (in > 32 || out > 32 ) {
-		this->Registr[in - 40] = 0x00000000ffffffff & (this->Registr[out - 40]);
-	}
-	else {
-		this->Registr[in] = this->Registr[out];
-	}
-}
+
 //___________________________________________________________________________________________________
 
-void ARM64::MOV_RC(int in, unsigned short con) { //unsigned short
-	if (in > 32 || con > 32) {
-		this->Registr[in - 40] = ~(con--);
-	}
-	else {
-		this->Registr[in] = con--;
-	    this->Registr[in] = ~this->Registr[in];
-	}
-}
+
 
 //___________________________________________________________________________________________________
 
